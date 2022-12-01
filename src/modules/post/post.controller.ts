@@ -8,7 +8,6 @@ export class PostController {
 
   @Get()
   getPosts() {
-    console.log('running');
     return this.postService.getPosts();
   }
 

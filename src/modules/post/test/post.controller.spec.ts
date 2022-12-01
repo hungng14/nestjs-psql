@@ -1,12 +1,15 @@
+import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PostStatus } from '../const/post-status';
 import { PostController } from '../post.controller';
 import { PostService } from '../post.service';
 import { postMock } from '../__mocks__/posts.mock';
+import * as request from 'supertest';
 
 jest.mock('../post.service');
 
 describe('PostController', () => {
+  let app: INestApplication;
   let postController: PostController;
   let postService: PostService;
   beforeEach(async () => {
@@ -15,18 +18,35 @@ describe('PostController', () => {
       controllers: [PostController],
       providers: [PostService],
     }).compile();
+    app = moduleRef.createNestApplication();
+    await app.init();
     postController = moduleRef.get<PostController>(PostController);
     postService = moduleRef.get<PostService>(PostService);
     jest.clearAllMocks();
   });
 
-  describe('getPost', () => {
+  it('/GET post', async () => {
+    return request(app.getHttpServer()).get('/post').expect(200);
+  });
+
+  describe('Get Posts', () => {
     describe('When get Post is called', () => {
-      let post: any;
       let posts: any[];
       beforeEach(async () => {
-        post = await postController.getPostById(postMock.id);
         posts = await postController.getPosts();
+      });
+
+      test('then it should return posts', () => {
+        expect(posts).toEqual([postMock]);
+      });
+    });
+  });
+
+  describe('Get Post Detail', () => {
+    describe('When get Post is called', () => {
+      let post: any;
+      beforeEach(async () => {
+        post = await postController.getPostById(postMock.id);
       });
 
       test('then is should call postService', () => {
@@ -36,14 +56,10 @@ describe('PostController', () => {
       test('then it should return a post', () => {
         expect(post).toEqual(postMock);
       });
-
-      test('then it should return posts', () => {
-        expect(posts).toEqual([postMock]);
-      });
     });
   });
 
-  describe('CreatePost', () => {
+  describe('Create a New Post', () => {
     describe('When Post created', () => {
       let newPostCreated: any;
       const dataPost = {

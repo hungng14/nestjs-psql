@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { PREFIX_PATH } from './constants';
 import { AppExceptionFilter } from './exception';
 
 async function bootstrap() {
@@ -11,7 +12,7 @@ async function bootstrap() {
     }),
   );
   app.useGlobalFilters(new AppExceptionFilter());
-  app.setGlobalPrefix('api/v1/');
+  app.setGlobalPrefix(PREFIX_PATH);
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
